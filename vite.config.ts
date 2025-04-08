@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => ({
     plugins: [react(), mode === 'development' && componentTagger()].filter(
         Boolean
     ),
+    base: '/vibe-palette-generator/',
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
