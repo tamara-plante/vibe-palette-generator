@@ -114,7 +114,7 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
           </Dialog>
         </div>
         <p className="text-muted-foreground">
-          Enter a vibe, mood, or theme to generate a custom color palette
+          Enter a vibe, mood, or theme to generate a custom 10-color palette with design principles in mind
         </p>
       </div>
       
