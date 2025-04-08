@@ -27,7 +27,7 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
   
   // Load API key from localStorage on component mount
   useEffect(() => {
-    const savedApiKey = localStorage.getItem("openai_api_key");
+    const savedApiKey = localStorage.getItem("gemini_api_key");
     if (savedApiKey) {
       setApiKey(savedApiKey);
     }
@@ -51,10 +51,10 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
   
   const handleSaveApiKey = () => {
     if (apiKey.trim()) {
-      localStorage.setItem("openai_api_key", apiKey.trim());
+      localStorage.setItem("gemini_api_key", apiKey.trim());
       toast.success("API key saved successfully");
     } else {
-      localStorage.removeItem("openai_api_key");
+      localStorage.removeItem("gemini_api_key");
       toast.info("API key removed");
     }
     setIsDialogOpen(false);
@@ -89,9 +89,9 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>OpenAI API Settings</DialogTitle>
+                <DialogTitle>Gemini API Settings</DialogTitle>
                 <DialogDescription>
-                  Enter your OpenAI API key to generate more accurate color palettes.
+                  Enter your Google Gemini API key to generate more accurate color palettes.
                   Leave empty to use the built-in mock generator.
                 </DialogDescription>
               </DialogHeader>
@@ -99,7 +99,7 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
                 <Input
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="sk-..."
+                  placeholder="AIzaSyA..."
                   type="password"
                   className="w-full"
                 />

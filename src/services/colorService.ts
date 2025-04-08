@@ -1,8 +1,8 @@
 import { toast } from "sonner";
 
-const API_URL = "https://api.openai.com/v1/chat/completions";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
 // This would typically be stored in environment variables
-const MODEL = "gpt-3.5-turbo";
+const MODEL = "gemini-pro";
 
 export interface ColorPalette {
   id: string;
@@ -11,43 +11,35 @@ export interface ColorPalette {
   timestamp: number;
 }
 
-interface OpenAIResponse {
-  choices: {
-    message: {
-      content: string;
-    };
-  }[];
-}
-
 export const generateColorPalette = async (prompt: string): Promise<ColorPalette | null> => {
   try {
     let colors: string[];
     
-    // Try to use OpenAI API if the user provides an API key in localStorage
-    const apiKey = localStorage.getItem('openai_api_key');
+    // Try to use Gemini API if the user provides an API key in localStorage
+    const apiKey = localStorage.getItem('gemini_api_key');
     
     if (apiKey) {
-      // Example OpenAI API call
-      const response = await fetch(API_URL, {
+      // Gemini API call
+      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: MODEL,
-          messages: [
-            {
-              role: "system",
-              content: "You are a color palette generator. Generate a color palette of 5 hex colors based on the given theme or mood. Return ONLY a JSON array of hex color codes without any explanation."
-            },
+          contents: [
             {
               role: "user",
-              content: `Generate a color palette for: ${prompt}`
+              parts: [
+                {
+                  text: `Generate a color palette of 5 hex colors based on the theme: ${prompt}. Return ONLY a JSON array of hex color codes without any explanation.`
+                }
+              ]
             }
           ],
-          temperature: 0.7,
-          max_tokens: 200
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 200
+          }
         })
       });
       
@@ -55,18 +47,20 @@ export const generateColorPalette = async (prompt: string): Promise<ColorPalette
         throw new Error(`API error: ${response.status}`);
       }
       
-      const data: OpenAIResponse = await response.json();
+      const data = await response.json();
       
       try {
+        // Extract content from Gemini response
+        const content = data.candidates[0].content.parts[0].text;
         // Parse the content as a JSON array of strings
-        colors = JSON.parse(data.choices[0].message.content);
+        colors = JSON.parse(content);
         
         // Validate that we got an array of 5 hex colors
         if (!Array.isArray(colors) || colors.length !== 5 || !colors.every(c => /^#[0-9A-F]{6}$/i.test(c))) {
           throw new Error('Invalid color format received');
         }
       } catch (parseError) {
-        console.error("Error parsing OpenAI response:", parseError);
+        console.error("Error parsing Gemini response:", parseError);
         // Fall back to mock colors
         colors = generateMockColors(prompt);
       }
