@@ -159,6 +159,15 @@ export const savePalette = (palette: ColorPalette): void => {
   localStorage.setItem('colorPalettes', JSON.stringify(updatedPalettes));
 };
 
+// Function to remove a specific palette by ID
+export const removePalette = (id: string): void => {
+  const savedPalettes = getSavedPalettes();
+  const updatedPalettes = savedPalettes.filter(palette => palette.id !== id);
+  localStorage.setItem('colorPalettes', JSON.stringify(updatedPalettes));
+  // Dispatch event to notify other components
+  window.dispatchEvent(new Event('paletteUpdated'));
+};
+
 // Function to get saved palettes from local storage
 export const getSavedPalettes = (): ColorPalette[] => {
   const savedData = localStorage.getItem('colorPalettes');

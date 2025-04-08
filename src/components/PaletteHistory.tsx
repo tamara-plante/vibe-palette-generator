@@ -1,8 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { getSavedPalettes, ColorPalette as ColorPaletteType } from "@/services/colorService";
+import { getSavedPalettes, ColorPalette as ColorPaletteType, removePalette } from "@/services/colorService";
 import ColorPalette from "./ColorPalette";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const PaletteHistory: React.FC = () => {
   const [savedPalettes, setSavedPalettes] = useState<ColorPaletteType[]>([]);
@@ -33,6 +36,12 @@ const PaletteHistory: React.FC = () => {
     setSavedPalettes(palettes);
     setIsVisible(palettes.length > 0);
   };
+
+  const handleDeletePalette = (id: string) => {
+    removePalette(id);
+    loadPalettes();
+    toast.success("Palette deleted");
+  };
   
   if (!isVisible || savedPalettes.length === 0) {
     return null;
@@ -49,6 +58,7 @@ const PaletteHistory: React.FC = () => {
             setIsVisible(false);
             // Dispatch event to notify other components
             window.dispatchEvent(new Event('paletteUpdated'));
+            toast.success("All palettes cleared");
           }}
           className="text-sm text-muted-foreground hover:text-destructive transition-colors"
         >
@@ -61,7 +71,18 @@ const PaletteHistory: React.FC = () => {
         savedPalettes.length > 2 ? "md:grid-cols-2" : ""
       )}>
         {savedPalettes.map((palette) => (
-          <ColorPalette key={palette.id} palette={palette} />
+          <div key={palette.id} className="group relative">
+            <ColorPalette palette={palette} />
+            <Button 
+              variant="destructive" 
+              size="icon" 
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => handleDeletePalette(palette.id)}
+              title="Delete palette"
+            >
+              <Trash2 size={16} />
+            </Button>
+          </div>
         ))}
       </div>
     </div>
