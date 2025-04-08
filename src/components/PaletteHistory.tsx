@@ -9,10 +9,30 @@ const PaletteHistory: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   
   useEffect(() => {
+    // Load palettes on mount
+    loadPalettes();
+    
+    // Listen for storage events (from other components)
+    const handleStorageChange = () => {
+      loadPalettes();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also create a custom event listener for local changes
+    window.addEventListener('paletteUpdated', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('paletteUpdated', handleStorageChange);
+    };
+  }, []);
+  
+  const loadPalettes = () => {
     const palettes = getSavedPalettes();
     setSavedPalettes(palettes);
     setIsVisible(palettes.length > 0);
-  }, []);
+  };
   
   if (!isVisible || savedPalettes.length === 0) {
     return null;
@@ -27,6 +47,8 @@ const PaletteHistory: React.FC = () => {
             localStorage.removeItem('colorPalettes');
             setSavedPalettes([]);
             setIsVisible(false);
+            // Dispatch event to notify other components
+            window.dispatchEvent(new Event('paletteUpdated'));
           }}
           className="text-sm text-muted-foreground hover:text-destructive transition-colors"
         >

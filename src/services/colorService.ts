@@ -1,8 +1,6 @@
-
 import { toast } from "sonner";
 
 const API_URL = "https://api.openai.com/v1/chat/completions";
-// We're using a free API key from https://platform.openai.com/docs/quickstart
 // This would typically be stored in environment variables
 const MODEL = "gpt-3.5-turbo";
 
@@ -23,15 +21,61 @@ interface OpenAIResponse {
 
 export const generateColorPalette = async (prompt: string): Promise<ColorPalette | null> => {
   try {
-    // Since we're making this as a frontend-only app for GitHub pages,
-    // we'll use a mock response for demonstration purposes
-    // In a real app, you would call the actual API with a valid key
+    let colors: string[];
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Try to use OpenAI API if the user provides an API key in localStorage
+    const apiKey = localStorage.getItem('openai_api_key');
     
-    // Generate a semi-random but thematically appropriate color palette based on the prompt
-    const colors = generateMockColors(prompt);
+    if (apiKey) {
+      // Example OpenAI API call
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            {
+              role: "system",
+              content: "You are a color palette generator. Generate a color palette of 5 hex colors based on the given theme or mood. Return ONLY a JSON array of hex color codes without any explanation."
+            },
+            {
+              role: "user",
+              content: `Generate a color palette for: ${prompt}`
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 200
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data: OpenAIResponse = await response.json();
+      
+      try {
+        // Parse the content as a JSON array of strings
+        colors = JSON.parse(data.choices[0].message.content);
+        
+        // Validate that we got an array of 5 hex colors
+        if (!Array.isArray(colors) || colors.length !== 5 || !colors.every(c => /^#[0-9A-F]{6}$/i.test(c))) {
+          throw new Error('Invalid color format received');
+        }
+      } catch (parseError) {
+        console.error("Error parsing OpenAI response:", parseError);
+        // Fall back to mock colors
+        colors = generateMockColors(prompt);
+      }
+    } else {
+      // No API key, use mock generator
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      colors = generateMockColors(prompt);
+    }
     
     const palette: ColorPalette = {
       id: generateId(),

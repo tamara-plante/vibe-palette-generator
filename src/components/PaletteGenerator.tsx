@@ -1,9 +1,19 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Wand2 } from "lucide-react";
+import { Wand2, Settings2 } from "lucide-react";
 import { generateColorPalette, ColorPalette as ColorPaletteType, savePalette } from "@/services/colorService";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface PaletteGeneratorProps {
   onGenerate: (palette: ColorPaletteType) => void;
@@ -12,7 +22,17 @@ interface PaletteGeneratorProps {
 const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
+  // Load API key from localStorage on component mount
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem("openai_api_key");
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
+
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt.trim()) return;
@@ -27,6 +47,17 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleSaveApiKey = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem("openai_api_key", apiKey.trim());
+      toast.success("API key saved successfully");
+    } else {
+      localStorage.removeItem("openai_api_key");
+      toast.info("API key removed");
+    }
+    setIsDialogOpen(false);
   };
   
   const placeholders = [
@@ -46,9 +77,42 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
   return (
     <div className="w-full max-w-3xl mx-auto">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-theme-purple to-theme-dark-purple bg-clip-text text-transparent">
-          Vibe Palette
-        </h1>
+        <div className="flex items-center justify-center gap-2">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-theme-purple to-theme-dark-purple bg-clip-text text-transparent">
+            Vibe Palette
+          </h1>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full" title="API Settings">
+                <Settings2 size={18} />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>OpenAI API Settings</DialogTitle>
+                <DialogDescription>
+                  Enter your OpenAI API key to generate more accurate color palettes.
+                  Leave empty to use the built-in mock generator.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <Input
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk-..."
+                  type="password"
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Your API key is stored locally in your browser and never sent to our servers.
+                </p>
+              </div>
+              <DialogFooter>
+                <Button onClick={handleSaveApiKey}>Save</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
         <p className="text-muted-foreground">
           Enter a vibe, mood, or theme to generate a custom color palette
         </p>
