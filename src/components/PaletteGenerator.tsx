@@ -78,7 +78,7 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
     <div className="w-full max-w-3xl mx-auto">
       <div className="mb-8 text-center">
         <div className="flex items-center justify-center gap-2">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-theme-purple to-theme-dark-purple bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-2 title-gradient">
             Vibe Palette
           </h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -126,7 +126,11 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
           className="flex-1"
           disabled={isLoading}
         />
-        <Button type="submit" disabled={isLoading || !prompt.trim()}>
+        <Button 
+          type="submit" 
+          disabled={isLoading || !prompt.trim()}
+          className="btn-deep-blue"
+        >
           {isLoading ? (
             <span className="flex items-center gap-2">
               <Wand2 size={18} className="animate-spin" /> Generating...

@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -43,6 +42,10 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --deep-blue: 220 70% 40%;
+    --deep-blue-hover: 220 70% 35%;
+    --destructive-hover: 0 84.2% 50%;
   }
 
   .dark {
@@ -82,6 +85,10 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --deep-blue: 220 70% 50%;
+    --deep-blue-hover: 220 70% 45%;
+    --destructive-hover: 0 62.8% 25%;
   }
 }
 
@@ -93,4 +100,17 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom button styles */
+.btn-deep-blue {
+  @apply bg-[hsl(var(--deep-blue))] text-white hover:bg-[hsl(var(--deep-blue-hover))] transition-colors;
+}
+
+.title-gradient {
+  @apply bg-gradient-to-r from-[hsl(var(--deep-blue))] to-theme-dark-purple bg-clip-text text-transparent;
+}
+
+.btn-clear {
+  @apply text-sm text-muted-foreground hover:text-[hsl(var(--destructive-hover))] transition-colors;
 }

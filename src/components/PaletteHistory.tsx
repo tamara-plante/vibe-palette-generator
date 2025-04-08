@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { getSavedPalettes, ColorPalette as ColorPaletteType, removePalette } from "@/services/colorService";
 import ColorPalette from "./ColorPalette";
@@ -60,7 +59,7 @@ const PaletteHistory: React.FC = () => {
             window.dispatchEvent(new Event('paletteUpdated'));
             toast.success("All palettes cleared");
           }}
-          className="text-sm text-muted-foreground hover:text-destructive transition-colors"
+          className="btn-clear"
         >
           Clear History
         </button>
