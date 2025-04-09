@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Wand2, Settings2 } from "lucide-react";
 import { generateColorPalette, ColorPalette as ColorPaletteType, savePalette } from "@/services/colorService";
 import { toast } from "sonner";
+import ThemeToggle from "./ThemeToggle";
 import {
   Dialog,
   DialogContent,
@@ -81,37 +82,45 @@ const PaletteGenerator: React.FC<PaletteGeneratorProps> = ({ onGenerate }) => {
           <h1 className="text-4xl font-bold mb-2 title-gradient">
             Vibe Palette
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full" title="API Settings">
-                <Settings2 size={18} />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Gemini API Settings</DialogTitle>
-                <DialogDescription>
-                  Enter your Google Gemini API key to generate more accurate color palettes.
-                  Leave empty to use the built-in mock generator.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                <Input
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="AIzaSyA..."
-                  type="password"
-                  className="w-full"
-                />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Your API key is stored locally in your browser and never sent to our servers.
-                </p>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleSaveApiKey}>Save</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="rounded-full bg-secondary hover:bg-secondary/80" 
+                  title="API Settings"
+                >
+                  <Settings2 size={18} className="text-foreground" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Gemini API Settings</DialogTitle>
+                  <DialogDescription>
+                    Enter your Google Gemini API key to generate more accurate color palettes.
+                    Leave empty to use the built-in mock generator.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                  <Input
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="AIzaSyA..."
+                    type="password"
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Your API key is stored locally in your browser and never sent to our servers.
+                  </p>
+                </div>
+                <DialogFooter>
+                  <Button onClick={handleSaveApiKey}>Save</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         <p className="text-muted-foreground">
           Enter a vibe, mood, or theme to generate a custom 10-color palette with design principles in mind
