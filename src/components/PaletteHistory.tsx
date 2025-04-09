@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { getSavedPalettes, ColorPalette as ColorPaletteType, removePalette } from "@/services/colorService";
 import ColorPalette from "./ColorPalette";
@@ -6,7 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-const PaletteHistory: React.FC = () => {
+interface PaletteHistoryProps {
+  onSelectPalette?: (palette: ColorPaletteType) => void;
+}
+
+const PaletteHistory: React.FC<PaletteHistoryProps> = ({ onSelectPalette }) => {
   const [savedPalettes, setSavedPalettes] = useState<ColorPaletteType[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   
@@ -36,10 +41,18 @@ const PaletteHistory: React.FC = () => {
     setIsVisible(palettes.length > 0);
   };
 
-  const handleDeletePalette = (id: string) => {
+  const handleDeletePalette = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering palette selection
     removePalette(id);
     loadPalettes();
     toast.success("Palette deleted");
+  };
+  
+  const handleSelectPalette = (palette: ColorPaletteType) => {
+    if (onSelectPalette) {
+      onSelectPalette(palette);
+      toast.success("Palette selected");
+    }
   };
   
   if (!isVisible || savedPalettes.length === 0) {
@@ -71,12 +84,15 @@ const PaletteHistory: React.FC = () => {
       )}>
         {savedPalettes.map((palette) => (
           <div key={palette.id} className="group relative">
-            <ColorPalette palette={palette} />
+            <ColorPalette 
+              palette={palette} 
+              onSelect={() => handleSelectPalette(palette)}
+            />
             <Button 
               variant="destructive" 
               size="icon" 
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => handleDeletePalette(palette.id)}
+              onClick={(e) => handleDeletePalette(palette.id, e)}
               title="Delete palette"
             >
               <Trash2 size={16} />

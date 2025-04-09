@@ -15,6 +15,10 @@ const Index = () => {
     window.dispatchEvent(new Event('storage'));
   };
 
+  const handleSelectFromHistory = (palette: ColorPaletteType) => {
+    setCurrentPalette(palette);
+  };
+
   return (
     <div className="min-h-screen py-8 px-4">
       {/* Header */}
@@ -28,7 +32,7 @@ const Index = () => {
       )}
 
       {/* History */}
-      <PaletteHistory />
+      <PaletteHistory onSelectPalette={handleSelectFromHistory} />
       
       {/* Footer */}
       <footer className="mt-12 text-center text-sm text-muted-foreground">
